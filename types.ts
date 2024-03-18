@@ -1,4 +1,3 @@
-
 interface Transaction {
   idempotencyId: string;
   amount: number;

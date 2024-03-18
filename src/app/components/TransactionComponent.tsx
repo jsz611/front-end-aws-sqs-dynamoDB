@@ -1,9 +1,9 @@
-// Componente TransactionComponent
-import React from 'react';
+import React from "react";
 
 interface Transaction {
   idempotencyId: string;
-  amount: number;
+  amount: number | string;
+  price: number | string;
   type: string;
 }
 
@@ -11,40 +11,47 @@ interface TransactionComponentProps {
   transaction: Transaction;
 }
 
-const TransactionComponent: React.FC<TransactionComponentProps> = ({ transaction }) => {
+const TransactionComponent: React.FC<TransactionComponentProps> = ({
+  transaction,
+}) => {
   if (!transaction) {
-    return <div>Error: Transaction not provided.</div>;
+    return <div className="text-red-500">Error: Transaction not provided.</div>;
   }
 
-  const { idempotencyId, amount, type } = transaction;
+  const { idempotencyId, amount, price, type } = transaction;
 
-  if (typeof idempotencyId !== 'string' || typeof amount !== 'number' || typeof type !== 'string') {
-    return <div>Error: Invalid transaction data.</div>;
-  }
+  const formatValue = (value: number | string) => {
+    const num = parseFloat(value as string);
+    return !isNaN(num) ? num.toFixed(2) : "";
+  };
 
-  const typeColor = type === 'debit' ? 'bg-red-500' : 'bg-green-500';
+  const formattedAmount = formatValue(amount);
+  const formattedPrice = formatValue(price);
+  const typeColor = type === "debit" ? "text-red-500" : "text-green-500";
 
   return (
-    <div
-      className={`
-        bg-gray-800 text-white rounded-lg overflow-hidden border border-gray-700
-        flex flex-col min-h-[7rem] p-4
-      `}
-    >
-      <div className={`flex-grow ${typeColor}`}>
-        <div className="font-bold text-xl capitalize">{type}</div>
-        <p className="text-base mt-2">ID: {idempotencyId}</p>
-        <p className="text-base">Amount: ${amount.toFixed(2)}</p>
-      </div>
-      <div className="mt-4">
-        <span
-          className={`
-            inline-block bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 ${typeColor}
-          `}
-        >
-          {type.toUpperCase()}
-        </span>
-      </div>
+    <div className="p-4 border border-gray-200 shadow rounded-md overflow-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <tbody className="bg-white divide-y divide-gray-200">
+          <tr>
+            <td
+              className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${typeColor}`}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {idempotencyId}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              ${formattedAmount}
+            </td>
+
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              ${formattedPrice}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
